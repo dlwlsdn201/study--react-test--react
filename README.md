@@ -20,8 +20,6 @@
 
 # :mag: React Testing Library 란 ?
 
----
-
 → *React Component 를 Test 하는 가벼운 솔루션!*
 
 React Testing Library는 React 구성 요소 작업을 위한 API를 추가하여 DOM  Testing Library 위에 구축된다.
@@ -42,9 +40,7 @@ $npm install --save-dev @testing-library/react
 
 → 행위 주도 테스트
 
-# DOM (Document Object Model)
-
----
+# :mag:DOM (Document Object Model)
 
 - `Document`: 문서
 - `Object`: 객체
@@ -59,9 +55,7 @@ $npm install --save-dev @testing-library/react
 - DOM은 HTML문서의 내용과 구조가 `객체 모델` 로 변화되어 다양한 프로그램에서 사용될 수 있다.
 - HTML과는 다르게 DOM은 JS에 의해 수정될 수 있다.
 
-# 웹페이지 빌드 프로세스 (CRP; Critical Rendering Path)
-
----
+# :mag:웹페이지 빌드 프로세스 (CRP; Critical Rendering Path)
 
 → **브라우저**가 **서버**에서 페이지에 대한 HTML 응답을 받고 화면에 표시하기 전 여러 프로세스가 있다.
 
