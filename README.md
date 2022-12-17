@@ -142,3 +142,36 @@ test/
 3. `Layout` →  브라우저가 page에 표시되는 각 요소의 `크기`, `위치` 를 계산하는 단계이다.
 4. `Paint` → 페인트 단계에 도달하면 브라우저는 `layout 결과`를 선택하고 `pixel`을 화면에 페인트 한다.
 > ![image](https://user-images.githubusercontent.com/53039583/207474810-1579e1fd-3046-432f-b925-49a884a440cf.png)
+
+# react app 프로젝트 생성하기
+
+## 일반적인 생성
+
+### `npm` 패키지 매니저로 생성
+
+```bash
+$npm install create-react-app <프로젝트명>
+
+# 로컬에 전역적으로 설치를 하고 싶은 경우
+$npm install -g create-react-app <프로젝트명>
+```
+
+### `yarn`  패키지 매니저로 생성
+
+```bash
+$yarn add create-react-app <프로젝트명>
+
+# 로컬에 전역적으로 설치를 하고 싶은 경우
+$yarn add global create-react-app <프로젝트명>
+
+```
+
+## Disk 공간을 낭비하지 않고 항상 최신 버전으로 생성하고 싶은 경우
+
+### `npx` 패키지 매니저로 생성
+
+- npx는 npm registry에서 `패키지`  데이터를 찾아 `다운로드 없이 바로 실행` 시켜준다.
+
+```bash
+$npx create-react-app <프로젝트 폴더명>
+```
