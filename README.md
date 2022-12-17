@@ -40,6 +40,82 @@ $npm install --save-dev @testing-library/react
 
 → 행위 주도 테스트
 
+# :mag: Jest란?
+
+→ Facebook 에서 개발한 `자바스크립트 테스팅 라이브러리`.
+최소한의 설정으로 동작하면  Test case 를 만들어서 어플리케이션 코드가 잘 작동하는지 검사해준다.
+주로 **단위 테스트**를 위해 사용한다.
+
+## 환경 세팅
+
+### 설치
+
+```bash
+# yarn 패키지 매니저를 사용할 경우
+$yarn add jest --dev
+
+# npm 패키지 매니저를 사용할 경우
+$npm install jest --save-dev
+```
+
+### 스크립트
+
+```json
+// package.json
+{
+  "scripts": {
+    "test": "jest", // 또는 "jest --watchAll" 
+   },
+}
+```
+
+### 테스트 파일 디렉터리
+
+```bash
+# 프로젝트 폴더 (root)
+
+test/
+	integration/ # 통합 테스트 파일 폴더
+		- products.int.test.js
+	unit/ # 유닛 테스트 파일 폴더
+		- products.test.js
+```
+
+![image](https://user-images.githubusercontent.com/53039583/208230640-2c8e585e-969b-43a9-822e-9832847a488d.png)
+
+![image](https://user-images.githubusercontent.com/53039583/208230646-60ef14bc-3f8c-4de4-81ad-c7f78e162ecf.png)
+
+### 테스트 파일 코드 구조
+
+![image](https://user-images.githubusercontent.com/53039583/208230654-6156e9ce-048d-4d90-8d93-1d0e560d70b0.png)
+
+- `describe` : 여러 관련 테스트를 그룹화하는 블록을 만든다. (ex_ 과일)
+- `it` : 개별 테스트를 수행하는 곳. 각 test를 작은 문장처럼 설명한다. (ex_ 바나나)
+- `expect` : 값을 테스트할 때마다 사용된다. 그리고 expect  함수 혼자서는 거의 사용되지 않고, **matcher 와 함께 사용된다.**
+- `matcher` : expect 에 대한 결과 도출을 위해 테스트 방식을 정의하는 함수
+    
+    ![image](https://user-images.githubusercontent.com/53039583/208230671-9ad88ea7-e64a-47b5-81ed-df3c11ee1992.png)
+    
+    ![image](https://user-images.githubusercontent.com/53039583/208230675-d605612c-7d37-4d17-904c-39f86b2e407e.png)
+    
+    ![image](https://user-images.githubusercontent.com/53039583/208230678-7292641b-4055-458b-89b7-c552452b769d.png)
+    
+- `render()` : DOM에 컴포넌트를 rendering 하는 함수. 인자 형식은 **react component**. ****
+
+## React Testing Library  와 Jest 의 비교
+
+→ React Testing Library 와는 다른 개념이기 때문에 보통 함께 사용한다.
+
+- `Jest` : Test runner 이다.
+- `React Testing Library(RTL)` : Test runner 를 위한 공간 (Virtual DOM) 을 제공한다.
+
+### 예시
+
+→ example 이라는 컴포넌트에서 버튼을 눌렀을 때 기능이 동작하는 지 테스트를 수행하는 상황일 때
+
+- example 컴포넌트를 rendering 하고 컴포넌트에서 버튼을 찾는 것 → `RTL` 의 역할
+- 버튼의 동작을 테스트하는 것 → `jest` 의 역할
+
 # :mag:DOM (Document Object Model)
 
 - `Document`: 문서
