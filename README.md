@@ -143,7 +143,7 @@ test/
 4. `Paint` → 페인트 단계에 도달하면 브라우저는 `layout 결과`를 선택하고 `pixel`을 화면에 페인트 한다.
 > ![image](https://user-images.githubusercontent.com/53039583/207474810-1579e1fd-3046-432f-b925-49a884a440cf.png)
 
-# react app 프로젝트 생성하기
+# :mag: react app 프로젝트 생성하기
 
 ## 일반적인 생성
 
@@ -176,7 +176,7 @@ $yarn add global create-react-app <프로젝트명>
 $npx create-react-app <프로젝트 폴더명>
 ```
 
-# 쿼리 함수
+# :mag: 쿼리 함수
 
 → 페이지에서 DOM 요소를 찾기 위해 테스트 라이브러리가 제공하는 방법.
 
