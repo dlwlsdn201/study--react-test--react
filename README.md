@@ -175,3 +175,32 @@ $yarn add global create-react-app <프로젝트명>
 ```bash
 $npx create-react-app <프로젝트 폴더명>
 ```
+
+# 쿼리 함수
+
+→ 페이지에서 DOM 요소를 찾기 위해 테스트 라이브러리가 제공하는 방법.
+
+- `get-`
+- `find-`
+- `query-`
+
+![image](https://user-images.githubusercontent.com/53039583/208232230-7ce73237-feac-4477-8c2d-c12180933def.png)
+
+## getBy-
+
+→ 쿼리에 대해 일치하는 노드를 return 하며, 일치하는 요소가 없거나 둘 이상의 일치 결과가 발견되면 설명 오류를 발생시킴.
+(둘 이상의 요소가 예상되는 경우, `getAllBy`을 사용)
+
+## queryBy-
+
+→ 쿼리에 대해 일치하는 노드를 return  하며, 일치하는 요소가 없으면 `null`을 반환하고 둘 이상의 일치 항목이 발견되면 설명 오류를 발생시킴.
+(둘 이상의 일치 항목이 예상되는 경우, `queryAllBy`을 사용)
+
+## findBy-
+
+→ 주어진 쿼리와 일치하는 요소가 발견되면 `Promise`를 return 하며, 요소가 발견되지 않거나 기본 제한 시간인 1000ms 후에 둘 이상의 요소가 발견되면 Promise  가 거부된다. 
+(둘 이상의 요소를 find 해야 하는 경우,  `findAllBy`을 사용)
+
+## waitFor
+
+→ 일정 기간 동안 기다려야 할 때, expect() 가 통과할 때까지 기다릴 수 있다.
