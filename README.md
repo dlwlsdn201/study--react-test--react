@@ -237,3 +237,180 @@ $yarn add prettier
 - 실제 구현할 모든 기능들을 테스트하기 때문에 소스 코드에 **안정감**이 부여됨.
 - **디버깅 시간 ⇩**,**실제 개발 시간 ⇩** (실제 개발하면서 디버깅 부분에 대부분 시간이 소요됨.)
 - 소스 코드 하나하나를 더욱 신중하게 짤 수 있기 때문에 **깨끗하고 명확한 코드**가 작성될 확률 ⇧
+
+## (실습1) TDD 를 적용하여 간단한 counter 버튼 기능 테스트 해보기
+
+→ +, -, on/off 기능을 가진 버튼들을 구현해야한다고 가정했을 때, TDD 를 적용해본다.
+
+### 1. 버튼 UI 구현
+
+> UI 화면
+
+![image](https://user-images.githubusercontent.com/53039583/210288534-26dff456-4e79-41bb-b025-8480c99b3601.png)
+    
+> UI 컴포넌트 코드
+    
+    ```jsx
+    // App.js (메인 컴포넌트)
+    
+    import { useState } from 'react';
+    import styled from 'styled-components';
+    import Button from './components/Button';
+    
+    const DivContainer = styled.div`
+    	display: flex;
+    	justify-content: center;
+    	background-color: #282c34;
+    	height: 100%;
+    	flex-direction: column;
+    	align-items: center;
+    `;
+    
+    const DivHeader = styled.div`
+    	color: red;
+    `;
+    
+    const DivMain = styled.div`
+    	display: flex;
+    	justify-content: space-around;
+    	flex-direction: column;
+    	align-items: center;
+    `;
+    
+    const DivPlusMinusButtonWrapper = styled.div`
+    	display: block;
+    `;
+    
+    function App() {
+    	const [counter, setCounter] = useState(0);
+    
+    	const onIncrease = () => setCounter(counter + 1);
+    	const onDecrease = () => setCounter(counter - 1);
+    
+    	return (
+    		<DivContainer>
+    			<header>
+    				<DivHeader>
+    					<h3 data-testid='counter'>{counter}</h3>
+    				</DivHeader>
+    			</header>
+    			<main>
+    				<DivMain>
+    					<DivPlusMinusButtonWrapper>
+    						<Button
+    							testid='minus-button'
+    							content='-'
+    							onClick={() => onDecrease()}
+    						/>
+    						<Button
+    							testid='plus-button'
+    							content='+'
+    							onClick={() => onIncrease()}
+    						/>
+    					</DivPlusMinusButtonWrapper>
+    					<Button
+    						testid='onOff-button'
+    						content='on/off'
+    						onClick={console.log('스위치 작동')}
+    					/>
+    				</DivMain>
+    			</main>
+    		</DivContainer>
+    	);
+    }
+    
+    export default App;
+    ```
+    
+- button 모듈  컴포넌트
+
+    ```jsx
+    import React from 'react';
+    import styled from 'styled-components';
+    
+    const buttonElement = (props) => {
+    	const { testid, children, className } = props;
+    	return (
+    		<button className={className} data-testid={testid} onClick={props.onClick}>
+    			{children}
+    		</button>
+    	);
+    };
+    
+    const StyledButtonModule = styled(buttonElement)`
+    	width: 200px;
+    	height: 70px;
+    	background: #b77ae6;
+    	color: #fff;
+    	font-size: 2em;
+    `;
+    
+    const ButtonModule = (props) => (
+    	<StyledButtonModule {...props}>{props.children}</StyledButtonModule>
+    );
+    export default ButtonModule;
+    ```
+    
+### 2. 테스트 코드 작성
+
+> 테스트 코드
+
+```jsx
+// App.test.js
+
+import { fireEvent, render, screen } from '@testing-library/react';
+import App from './App';
+
+test('The counter starts at 0', () => {
+render(<App />); // App 컴포넌트 렌더링 (root 컴포넌트 렌더링)
+
+// screen object를 이용해서 원하는 element에 접근 (id로 접근)
+const counterElement = screen.getByTestId('counter');
+
+// id가 counter인 element의 텍스트가 0인지 테스트
+expect(counterElement).toHaveTextContent(0);
+});
+
+test('minus button has correct text', () => {
+render(<App />);
+const minusButtonElement = screen.getByTestId('minus-button');
+expect(minusButtonElement).toHaveTextContent('-'); // minusButtonElement 요소가 '-' 이라는 text 요소를 가지고 있는가?
+});
+
+test('plus button has correct text', () => {
+render(<App />);
+const plusButtonElement = screen.getByTestId('plus-button');
+expect(plusButtonElement).toHaveTextContent('+'); // plusButtonElement 요소가 '+' 이라는 text 요소를 가지고 있는가?
+});
+
+// ------ (+) Button 요소 테스트 코드 ------
+test('When the + button is pressed, the counter changes to 1', () => {
+render(<App />);
+
+// screen object를 이용해서 원하는 요소에 접근 (접근 시, Id로 접근)
+const buttonElement = screen.getByTestId('plus-button');
+
+// click plus button
+// fireEvent : DOM 에 대한 이벤트 속성들을 테스트 할 수 있게 해줌
+fireEvent.click(buttonElement);
+
+// 카운터가 0에서 +1 로 변화하여 최종 counter 값이 1이 됩니다.
+const counterElement = screen.getByTestId('counter');
+
+expect(counterElement).toHaveTextContent(1);
+});
+
+// ------ (-) Button 요소 테스트 코드 ------
+test('When the - button is pressed, the counter changes to -1', () => {
+render(<App />);
+
+const buttonElement = screen.getByTestId('minus-button');
+
+// click minus button
+// buttonElement 요소에 클릭 이벤트 발생
+fireEvent.click(buttonElement);
+
+const counterElement = screen.getByTestId('counter');
+expect(counterElement).toHaveTextContent(-1);
+});
+```
