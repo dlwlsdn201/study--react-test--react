@@ -53,3 +53,32 @@ test('When the - button is pressed, the counter changes to -1', () => {
 	const counterElement = screen.getByTestId('counter');
 	expect(counterElement).toHaveTextContent('1');
 });
+
+// on/off 스위치 생성을 위한 테스트 작성
+
+test('on/off button has blue color', () => {
+	render(<App />);
+
+	const buttonElement = screen.getByTestId('on/off-button');
+	// button 요소가 backgroundColor: 'blue' 라는 스타일 속성을 가지고 있는지?
+	expect(buttonElement).toHaveStyle(`backgroundColor: blue`);
+});
+
+test('plus button has red color', () => {
+	// 테스트를 진행할 컴포넌트 렌더링
+	render(<App />);
+
+	// [+버튼] 요소를 참조하는 변수 생성
+	const plusElement = screen.getByTestId('plus-button');
+
+	// [+버튼] 요소에 'backgroundColor' style 속성이 green 인지?
+	expect(plusElement).toHaveStyle(`backgroundColor: green`);
+});
+
+test('minus button has red color', () => {
+	render(<App />);
+	// [-버튼] 요소를 참조하는 변수 생성
+	const minusElement = screen.getByTestId('minus-button');
+
+	expect(minusElement).toHaveStyle({ backgroundColor: 'red' });
+});

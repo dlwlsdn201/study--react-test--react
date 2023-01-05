@@ -13,7 +13,7 @@ const buttonElement = (props) => {
 const StyledButtonModule = styled(buttonElement)`
 	width: 200px;
 	height: 70px;
-	background: #b77ae6;
+	background: ${(props) => props?.backgroundColor || '#b77ae6'};
 	color: #fff;
 	font-size: 2em;
 `;

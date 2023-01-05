@@ -46,17 +46,19 @@ function App() {
 							testid='minus-button'
 							content='-'
 							onClick={() => onDecrease()}
+							backgroundColor={!disabled ? 'red' : 'lightgray'}
 						/>
 						<Button
 							testid='plus-button'
 							content='+'
 							onClick={() => onIncrease()}
+							backgroundColor={!disabled ? 'green' : 'lightgray'}
 						/>
 					</DivPlusMinusButtonWrapper>
 					<Button
-						testid='onOff-button'
+						testid='on/off-button'
 						content='on/off'
-						onClick={console.log('스위치 작동')}
+						backgroundColor='blue'
 					/>
 				</DivMain>
 			</main>
