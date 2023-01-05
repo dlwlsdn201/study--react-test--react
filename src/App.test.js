@@ -54,8 +54,9 @@ test('When the - button is pressed, the counter changes to -1', () => {
 	expect(counterElement).toHaveTextContent('1');
 });
 
-// on/off 스위치 생성을 위한 테스트 작성
+// ======== 버튼의 style 속성값 테스트 코드 ========
 
+// on/off 스위치 생성을 위한 테스트 작성
 test('on/off button has blue color', () => {
 	render(<App />);
 
@@ -80,10 +81,13 @@ test('minus button has red color', () => {
 	// [-버튼] 요소를 참조하는 변수 생성
 	const minusElement = screen.getByTestId('minus-button');
 
+	// [+버튼] 요소에 'backgroundColor' style 속성이 red 인지?
 	expect(minusElement).toHaveStyle({ backgroundColor: 'red' });
 });
 
-test('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
+// ======== 버튼의 click event로 인한 dom 속성값 테스트 코드 ========
+
+test.only('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
 	render(<App />);
 
 	// on/off 버튼 요소 참조 변수 생성
@@ -98,6 +102,4 @@ test('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
 
 	expect(plusElement).toBeDisabled(); // +버튼이 disabled 처리 되었는지?
 	expect(minusElement).toBeDisabled(); // -버튼이 disabled 처리 되었는지?
-
-	//on/off 클릭 시
 });

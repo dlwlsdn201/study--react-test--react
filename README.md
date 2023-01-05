@@ -30,11 +30,11 @@ Create React App 으로 생성된 프로젝트는 즉시 React Testing Library�
 $npm install --save-dev @testing-library/react
 ```
 
-### Enzyme
+> ### Enzyme
 
 → 구현 주도 테스트
 
-### React Testing Library
+> ### React Testing Library
 
 → 행위 주도 테스트
 
@@ -46,7 +46,7 @@ $npm install --save-dev @testing-library/react
 
 ## 환경 세팅
 
-### 설치
+> ### 설치
 
 ```bash
 # yarn 패키지 매니저를 사용할 경우
@@ -56,7 +56,7 @@ $yarn add jest --dev
 $npm install jest --save-dev
 ```
 
-### 스크립트
+> ### 스크립트
 
 ```json
 // package.json
@@ -67,7 +67,7 @@ $npm install jest --save-dev
 }
 ```
 
-### 테스트 파일 디렉터리
+> ### 테스트 파일 디렉터리
 
 ```bash
 # 프로젝트 폴더 (root)
@@ -83,12 +83,15 @@ test/
 
 ![image](https://user-images.githubusercontent.com/53039583/208230646-60ef14bc-3f8c-4de4-81ad-c7f78e162ecf.png)
 
-### 테스트 파일 코드 구조
+> ### 테스트 파일 코드 구조
 
 ![image](https://user-images.githubusercontent.com/53039583/208230654-6156e9ce-048d-4d90-8d93-1d0e560d70b0.png)
 
 - `describe` : 여러 관련 테스트를 그룹화하는 블록을 만든다. (ex_ 과일)
 - `it` : 개별 테스트를 수행하는 곳. 각 test를 작은 문장처럼 설명한다. (ex_ 바나나)
+- `test`
+    - `test.skip()` : 해당 test() 구문은 skip 하고 다음 test 구문으로 넘어간다.
+    - `test.only()` : 해당 test() 구문만 실행한다. (나머지 test구문은 skip).
 - `expect` : 값을 테스트할 때마다 사용된다. 그리고 expect  함수 혼자서는 거의 사용되지 않고, **matcher 와 함께 사용된다.**
 - `matcher` : expect 에 대한 결과 도출을 위해 테스트 방식을 정의하는 함수
     
@@ -98,7 +101,9 @@ test/
     
     ![image](https://user-images.githubusercontent.com/53039583/208230678-7292641b-4055-458b-89b7-c552452b769d.png)
     
-- `render()` : DOM에 컴포넌트를 rendering 하는 함수. 인자 형식은 **react component**. ****
+- `render()` : DOM에 컴포넌트를 rendering 하는 함수. 인자 형식은 **react component**.
+- `fireEvent` : DOM Element 에 대한 **이벤트**를 제어하는 인스턴스
+    - `.click()` : DOM Element 에 클릭 이벤트 발생시킴
 
 ## React Testing Library  와 Jest 의 비교
 
@@ -107,7 +112,7 @@ test/
 - `Jest` : Test runner 이다.
 - `React Testing Library(RTL)` : Test runner 를 위한 공간 (Virtual DOM) 을 제공한다.
 
-### 예시
+> ### 예시
 
 → example 이라는 컴포넌트에서 버튼을 눌렀을 때 기능이 동작하는 지 테스트를 수행하는 상황일 때
 
@@ -145,7 +150,7 @@ test/
 
 ## 일반적인 생성
 
-### `npm` 패키지 매니저로 생성
+> ### `npm` 패키지 매니저로 생성
 
 ```bash
 $npm install create-react-app <프로젝트명>
@@ -154,7 +159,7 @@ $npm install create-react-app <프로젝트명>
 $npm install -g create-react-app <프로젝트명>
 ```
 
-### `yarn`  패키지 매니저로 생성
+> ### `yarn`  패키지 매니저로 생성
 
 ```bash
 $yarn add create-react-app <프로젝트명>
@@ -166,7 +171,7 @@ $yarn add global create-react-app <프로젝트명>
 
 ## Disk 공간을 낭비하지 않고 항상 최신 버전으로 생성하고 싶은 경우
 
-### `npx` 패키지 매니저로 생성
+> ### `npx` 패키지 매니저로 생성
 
 - npx는 npm registry에서 `패키지`  데이터를 찾아 `다운로드 없이 바로 실행` 시켜준다.
 
@@ -208,7 +213,7 @@ $npx create-react-app <프로젝트 폴더명>
 
 ## 설치
 
-### npm 으로 설치
+> ### npm 으로 설치
 
 → 여러 개발자와 같은 포맷 유지에 더 좋음
 
@@ -216,7 +221,7 @@ $npx create-react-app <프로젝트 폴더명>
 $yarn add prettier
 ```
 
-### vsCode 익스텐션으로 설치
+> ### vsCode 익스텐션으로 설치
 
 → 혼자 편하게 설치해서 사용하기 좋음
 
@@ -242,117 +247,9 @@ $yarn add prettier
 
 → +, -, on/off 기능을 가진 버튼들을 구현해야한다고 가정했을 때, TDD 를 적용해본다.
 
-### 1. 버튼 UI 구현
+→ TDD의 진행 순서는 반드시 [테스트 코드 작성] → [구현] 임을 유의한다.
 
-> UI 화면
-
-![image](https://user-images.githubusercontent.com/53039583/210288534-26dff456-4e79-41bb-b025-8480c99b3601.png)
-    
-> UI 컴포넌트 코드
-    
-    ```jsx
-    // App.js (메인 컴포넌트)
-    
-    import { useState } from 'react';
-    import styled from 'styled-components';
-    import Button from './components/Button';
-    
-    const DivContainer = styled.div`
-    	display: flex;
-    	justify-content: center;
-    	background-color: #282c34;
-    	height: 100%;
-    	flex-direction: column;
-    	align-items: center;
-    `;
-    
-    const DivHeader = styled.div`
-    	color: red;
-    `;
-    
-    const DivMain = styled.div`
-    	display: flex;
-    	justify-content: space-around;
-    	flex-direction: column;
-    	align-items: center;
-    `;
-    
-    const DivPlusMinusButtonWrapper = styled.div`
-    	display: block;
-    `;
-    
-    function App() {
-    	const [counter, setCounter] = useState(0);
-    
-    	const onIncrease = () => setCounter(counter + 1);
-    	const onDecrease = () => setCounter(counter - 1);
-    
-    	return (
-    		<DivContainer>
-    			<header>
-    				<DivHeader>
-    					<h3 data-testid='counter'>{counter}</h3>
-    				</DivHeader>
-    			</header>
-    			<main>
-    				<DivMain>
-    					<DivPlusMinusButtonWrapper>
-    						<Button
-    							testid='minus-button'
-    							content='-'
-    							onClick={() => onDecrease()}
-    						/>
-    						<Button
-    							testid='plus-button'
-    							content='+'
-    							onClick={() => onIncrease()}
-    						/>
-    					</DivPlusMinusButtonWrapper>
-    					<Button
-    						testid='onOff-button'
-    						content='on/off'
-    						onClick={console.log('스위치 작동')}
-    					/>
-    				</DivMain>
-    			</main>
-    		</DivContainer>
-    	);
-    }
-    
-    export default App;
-    ```
-    
-- button 모듈  컴포넌트
-
-    ```jsx
-    import React from 'react';
-    import styled from 'styled-components';
-    
-    const buttonElement = (props) => {
-    	const { testid, children, className } = props;
-    	return (
-    		<button className={className} data-testid={testid} onClick={props.onClick}>
-    			{children}
-    		</button>
-    	);
-    };
-    
-    const StyledButtonModule = styled(buttonElement)`
-    	width: 200px;
-    	height: 70px;
-    	background: #b77ae6;
-    	color: #fff;
-    	font-size: 2em;
-    `;
-    
-    const ButtonModule = (props) => (
-    	<StyledButtonModule {...props}>{props.children}</StyledButtonModule>
-    );
-    export default ButtonModule;
-    ```
-    
-### 2. 테스트 코드 작성
-
+> ### 테스트 코드 작성
 > 테스트 코드
 
 ```jsx
@@ -414,3 +311,343 @@ const counterElement = screen.getByTestId('counter');
 expect(counterElement).toHaveTextContent(-1);
 });
 ```
+
+> ### UI 화면
+![image](https://user-images.githubusercontent.com/53039583/210679504-f48763a4-9f16-470f-9c89-2b72ac68b07b.png)
+> ### Dom Element 코드
+
+    
+  ```jsx
+  // App.js (메인 컴포넌트)
+  
+  import { useState } from 'react';
+  import styled from 'styled-components';
+  import Button from './components/Button';
+  
+  const DivContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    background-color: #282c34;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+  `;
+  
+  const DivHeader = styled.div`
+    color: red;
+  `;
+  
+  const DivMain = styled.div`
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+  `;
+  
+  const DivPlusMinusButtonWrapper = styled.div`
+    display: block;
+  `;
+  
+  function App() {
+    const [counter, setCounter] = useState(0);
+  
+    const onIncrease = () => setCounter(counter + 1);
+    const onDecrease = () => setCounter(counter - 1);
+  
+    return (
+      <DivContainer>
+        <header>
+          <DivHeader>
+            <h3 data-testid='counter'>{counter}</h3>
+          </DivHeader>
+        </header>
+        <main>
+          <DivMain>
+            <DivPlusMinusButtonWrapper>
+              <Button
+                testid='minus-button'
+                content='-'
+                onClick={() => onDecrease()}
+              />
+              <Button
+                testid='plus-button'
+                content='+'
+                onClick={() => onIncrease()}
+              />
+            </DivPlusMinusButtonWrapper>
+            <Button
+              testid='onOff-button'
+              content='on/off'
+              onClick={console.log('스위치 작동')}
+            />
+          </DivMain>
+        </main>
+      </DivContainer>
+    );
+  }
+  
+  export default App;
+  ```
+## (실습2) TDD 를 적용하여 Dom Element 요소의 Style 속성값 Test 해보기
+
+→ + 버튼, - 버튼, on/off 버튼 각각의 `background Color` style 속성 값을 테스트 해본다.
+
+→ TDD의 진행 순서는 반드시 **[테스트 코드 작성] → [구현]** 임을 유의한다.
+
+> ### 테스트 코드 작성
+
+```jsx
+
+// App.test.js
+
+// on/off 스위치 생성을 위한 테스트 작성
+test('on/off button has blue color', () => {
+	render(<App />);
+
+	const buttonElement = screen.getByTestId('on/off-button');
+	// button 요소가 backgroundColor: 'blue' 라는 스타일 속성을 가지고 있는지?
+	expect(buttonElement).toHaveStyle(`backgroundColor: blue`);
+});
+
+test('plus button has red color', () => {
+	// 테스트를 진행할 컴포넌트 렌더링
+	render(<App />);
+
+	// [+버튼] 요소를 참조하는 변수 생성
+	const plusElement = screen.getByTestId('plus-button');
+
+	// [+버튼] 요소에 'backgroundColor' style 속성이 green 인지?
+	expect(plusElement).toHaveStyle(`backgroundColor: green`);
+});
+
+test('minus button has red color', () => {
+	render(<App />);
+	// [-버튼] 요소를 참조하는 변수 생성
+	const minusElement = screen.getByTestId('minus-button');
+
+	// [+버튼] 요소에 'backgroundColor' style 속성이 red 인지?
+	expect(minusElement).toHaveStyle({ backgroundColor: 'white' });
+});
+```
+
+> ### Dom Element 코드
+
+```jsx
+// App.js 
+
+import { useState } from 'react';
+import styled from 'styled-components';
+import Button from './components/Button';
+
+const DivContainer = styled.div`
+	display: flex;
+	justify-content: center;
+	background-color: #282c34;
+	height: 100%;
+	flex-direction: column;
+	align-items: center;
+`;
+
+const DivHeader = styled.div`
+	color: red;
+`;
+
+const DivMain = styled.div`
+	display: flex;
+	justify-content: space-around;
+	flex-direction: column;
+	align-items: center;
+`;
+
+const DivPlusMinusButtonWrapper = styled.div`
+	display: block;
+`;
+
+function App() {
+	const [counter, setCounter] = useState(0);
+
+	const onIncrease = () => setCounter(counter + 1);
+	const onDecrease = () => setCounter(counter - 1);
+
+	return (
+		<DivContainer>
+			<header>
+				<DivHeader>
+					<h3 data-testid='counter'>{counter}</h3>
+				</DivHeader>
+			</header>
+			<main>
+				<DivMain>
+					<DivPlusMinusButtonWrapper>
+						<Button
+							testid='minus-button'
+							content='-'
+							onClick={() => onDecrease()}
+							backgroundColor='white'
+						/>
+						<Button
+							testid='plus-button'
+							content='+'
+							onClick={() => onIncrease()}
+							backgroundColor='green'
+						/>
+					</DivPlusMinusButtonWrapper>
+					<Button
+						testid='on/off-button'
+						content='on/off'
+						backgroundColor='blue'
+					/>
+				</DivMain>
+			</main>
+		</DivContainer>
+	);
+}
+
+export default App;
+```
+
+> ### 결과
+![image](https://user-images.githubusercontent.com/53039583/210679639-eae115c3-3612-4a20-8dc0-c656158d06a0.png)
+
+→ 테스트 에러가 발생한 이유는 테스트 코드에서 [****************- 버튼]**************** 요소의 `backgroundColor` style 에 대한 기댓값은 ‘`red`’ 였으나, 실제 코드에 구현된 값은 ‘`white`’ 이기 때문이다.
+
+```jsx
+// App.js
+	<Button
+		testid='minus-button'
+		content='-'
+		onClick={() => onDecrease()}
+		backgroundColor='white'
+	/>
+```
+
+따라서, 위의 minus 버튼 요소 코드에서 backgroundColor 속성을 ‘red’ 로 바꾸면, 아래와 같이 정상적으로 테스트가 성공한다.
+
+![image](https://user-images.githubusercontent.com/53039583/210679649-8680b30b-7e74-44ce-8053-103c466d4d37.png)
+
+#
+## (실습3) TDD 를 적용하여 Dom Element 요소의 Click event로 인한 상태 변화 Test 해보기
+
+→ on/off 버튼을 클릭 시 **+ 버튼**, **- 버튼의  `disabled` 속성 값이 true가 되는지** 테스트 해본다.
+
+→ TDD의 진행 순서는 반드시 **[테스트 코드 작성] → [구현]** 임을 유의한다.
+
+> ### 테스트 코드 작성
+
+```jsx
+// App.test.js
+
+test.only('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
+	render(<App />);
+
+	// on/off 버튼 요소 참조 변수 생성
+	const onoffElement = screen.getByTestId('on/off-button');
+
+	// on/off 버튼 요소 클릭 이벤트 발생
+	fireEvent.click(onoffElement);
+
+	// +,- 버튼 요소 참조 변수 생성
+	const plusElement = screen.getByTestId('plus-button');
+	const minusElement = screen.getByTestId('minus-button');
+
+	expect(plusElement).toBeDisabled(); // +버튼이 disabled 처리 되었는지?
+	expect(minusElement).toBeDisabled(); // -버튼이 disabled 처리 되었는지?
+```
+
+
+> ### Dom Element 코드
+
+- `disabled` 라는 state 를 통해 +,- 버튼의 disabled 속성값을 관리한다.
+- `disabled` state 변경은 on/off 버튼의 onClick 속성을 통해 `updateDisabled()` 함수를 호출하여 이뤄진다.
+    
+    ```jsx
+    // App.js
+    
+    import { useState } from 'react';
+    import styled from 'styled-components';
+    import Button from './components/Button';
+    
+    const DivContainer = styled.div`
+    	display: flex;
+    	justify-content: center;
+    	background-color: #282c34;
+    	height: 100%;
+    	flex-direction: column;
+    	align-items: center;
+    `;
+    
+    const DivHeader = styled.div`
+    	color: red;
+    `;
+    
+    const DivMain = styled.div`
+    	display: flex;
+    	justify-content: space-around;
+    	flex-direction: column;
+    	align-items: center;
+    `;
+    
+    const DivPlusMinusButtonWrapper = styled.div`
+    	display: block;
+    `;
+    
+    function App() {
+    	const [counter, setCounter] = useState(0);
+    	const [disabled, setDisabled] = useState(false);
+    
+    	const onIncrease = () => setCounter(counter + 1);
+    	const onDecrease = () => setCounter(counter - 1);
+    	const updateDisabled = (value) => {
+    		setDisabled(value);
+    	};
+    
+    	return (
+    		<DivContainer>
+    			<header>
+    				<DivHeader>
+    					<h3 data-testid='counter'>{counter}</h3>
+    				</DivHeader>
+    			</header>
+    			<main>
+    				<DivMain>
+    					<DivPlusMinusButtonWrapper>
+    						<Button
+    							testid='minus-button'
+    							content='-'
+    							onClick={() => onDecrease()}
+    							backgroundColor={!disabled ? 'red' : 'lightgray'}
+    							disabled={disabled}
+    						/>
+    						<Button
+    							testid='plus-button'
+    							content='+'
+    							onClick={() => onIncrease()}
+    							backgroundColor={!disabled ? 'green' : 'lightgray'}
+    							disabled={disabled}
+    						/>
+    					</DivPlusMinusButtonWrapper>
+    					<Button
+    						testid='on/off-button'
+    						content='on/off'
+    						backgroundColor='blue'
+    						onClick={() => updateDisabled(!disabled)}
+    					/>
+    				</DivMain>
+    			</main>
+    		</DivContainer>
+    	);
+    }
+    
+    export default App;
+    ```
+    
+
+> ### 결과
+
+![image](https://user-images.githubusercontent.com/53039583/210679663-f2766de5-15ca-49b9-84b4-a4f11e83af26.png)
+
+→ **skipped** 란 ?
+
+- 테스트 코드에서 `test.only(…)` 구문 **외**에 모든 코드들
+- 테스트 코드에서  `test.skip(…)` 구문의 코드들
+
