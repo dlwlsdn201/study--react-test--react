@@ -2,9 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 const buttonElement = (props) => {
-	const { testid, children, className } = props;
+	const { testid, children, className, disabled } = props;
 	return (
-		<button className={className} data-testid={testid} onClick={props.onClick}>
+		<button
+			disabled={disabled}
+			className={className}
+			data-testid={testid}
+			onClick={props.onClick}>
 			{children}
 		</button>
 	);

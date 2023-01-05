@@ -28,9 +28,13 @@ const DivPlusMinusButtonWrapper = styled.div`
 
 function App() {
 	const [counter, setCounter] = useState(0);
+	const [disabled, setDisabled] = useState(false);
 
 	const onIncrease = () => setCounter(counter + 1);
 	const onDecrease = () => setCounter(counter - 1);
+	const updateDisabled = (value) => {
+		setDisabled(value);
+	};
 
 	return (
 		<DivContainer>
@@ -47,18 +51,21 @@ function App() {
 							content='-'
 							onClick={() => onDecrease()}
 							backgroundColor={!disabled ? 'red' : 'lightgray'}
+							disabled={disabled}
 						/>
 						<Button
 							testid='plus-button'
 							content='+'
 							onClick={() => onIncrease()}
 							backgroundColor={!disabled ? 'green' : 'lightgray'}
+							disabled={disabled}
 						/>
 					</DivPlusMinusButtonWrapper>
 					<Button
 						testid='on/off-button'
 						content='on/off'
 						backgroundColor='blue'
+						onClick={() => updateDisabled(!disabled)}
 					/>
 				</DivMain>
 			</main>

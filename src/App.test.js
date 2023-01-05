@@ -82,3 +82,22 @@ test('minus button has red color', () => {
 
 	expect(minusElement).toHaveStyle({ backgroundColor: 'red' });
 });
+
+test('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
+	render(<App />);
+
+	// on/off 버튼 요소 참조 변수 생성
+	const onoffElement = screen.getByTestId('on/off-button');
+
+	// on/off 버튼 요소 클릭 이벤트 발생
+	fireEvent.click(onoffElement);
+
+	// +,- 버튼 요소 참조 변수 생성
+	const plusElement = screen.getByTestId('plus-button');
+	const minusElement = screen.getByTestId('minus-button');
+
+	expect(plusElement).toBeDisabled(); // +버튼이 disabled 처리 되었는지?
+	expect(minusElement).toBeDisabled(); // -버튼이 disabled 처리 되었는지?
+
+	//on/off 클릭 시
+});
