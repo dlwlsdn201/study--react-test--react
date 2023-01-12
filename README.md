@@ -193,6 +193,29 @@ $npx create-react-app <프로젝트 폴더명>
 
 → 쿼리에 대해 일치하는 노드를 return 하며, 일치하는 요소가 없거나 둘 이상의 일치 결과가 발견되면 설명 오류를 발생시킴.
 (둘 이상의 요소가 예상되는 경우, `getAllBy`을 사용)
+- 추천 사용 우선순위
+    
+    
+    | 1순위 (Queries Accessible to Everyone) | getByRole |
+    | --- | --- |
+    |  | getByLabelText |
+    |  | getByPlaceholderText |
+    |  | getByText |
+    |  | getByDisplayValue |
+    | 2순위 (Sementic Queries) | getByAltText |
+    |  | getByTitle |
+    | 3순위 (Test IDs) | getByTestId |
+    - **getByTestId** 의 추천 우선순위가 낮은 이유?
+      <br/> 
+      → 일반 사용자들은 Test ID를 볼 수 없기 때문에 이 쿼리문은 테스트 시, **role / text 등의 요소들을 매칭시킬 수 없을 경우에만 최후의 수단**으로 시용하기를 권장한다.
+
+> ### getByRole()
+  - `button`, `checkbox`, `gridcell`, `link`, `menuitem`, `menuitemcheckbox`, `menuitemradio` 등
+
+    ```jsx
+    // role='button' 이고, name 속성이 대소문자 상관없이 'submit' 인 DOM Element 
+    const testElement = getByRole('button', {name: /submit/i})
+    ```
 
 ## queryBy-
 
