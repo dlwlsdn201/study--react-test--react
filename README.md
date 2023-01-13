@@ -104,6 +104,14 @@ test/
 - `render()` : DOM에 컴포넌트를 rendering 하는 함수. 인자 형식은 **react component**.
 - `fireEvent` : DOM Element 에 대한 **이벤트**를 제어하는 인스턴스
     - `.click()` : DOM Element 에 클릭 이벤트 발생시킴
+- `userEvent` : fireEvent 와 비슷하며, DOM 요소에 대한 focus 이벤트도 발생시킨다. (fireEvent 보다 더욱 신뢰성이 높음)
+
+>### userEvent
+→ userEvent는 fireEvent를 참조하여 만들어졌으며, DOM 요소 타입에 따라 그 DOM 요소에 맞는 더욱 적절한 반응을 보여준다. 
+예를 들어 fireEvent 로 버튼을 클릭하면 (`fireEvent.click(button)`) 클릭은 되지만 해당 버튼에 focus 이벤트는 발생되지 않는다. 하지만, userEvent으로 버튼을 클릭하면 (`userEvent.click(button)`) 버튼에 focus 이벤트가 발생한다. <br/>
+따라서, userEvent 는 실제 사용자가 UI를 사용하는 것 같은 이벤트들을 디테일하게 표현해준다.
+
+사용 추천 순위 : ***userEvent > fireEvent***
 
 ## React Testing Library  와 Jest 의 비교
 
