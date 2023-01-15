@@ -1,9 +1,11 @@
 {
-  "plugins": ["testing-library", "jest-dom"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["testing-library", "jest-dom", "@typescript-eslint"],
     "extends": [
       "react-app",
       "react-app/jest",
       "plugin:testing-library/react",
-      "plugin:jest-dom/recommended"
+      "plugin:jest-dom/recommended",
+      "plugin:@typescript-eslint/eslint-recommended"
     ]
 }
