@@ -682,3 +682,394 @@ test.only('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
 - 테스트 코드에서 `test.only(…)` 구문 **외**에 모든 코드들
 - 테스트 코드에서  `test.skip(…)` 구문의 코드들
 
+# 참조
+
+## 🔎 **MSW (Mock Service Worker)**
+
+> ### 정의
+
+Service Worker 을 이용해 서버를 향한 실제 네트워크 요청을 가로채서 모의 응답을 보내주는 API Mocking 라이브러리이다.
+
+> **Service Worker** 란?
+    
+  브라우저가 백그라운드에서 실행하는 스크립트로, 애플리케이션의 UI 블록 없이 연산을 처리할 수 있다.
+        웹 서비스와 브라우저 및 네트워크 사이에서 **프록시 서버 역할**을 하며, 오프라인에서도 서비스를 사용할 수 있도록 한다.
+      
+  - Service Worker 의 수명 주기는 웹페이지와는 완전히 별개이기 때문에 아래와 같은 기능에서 많이 사용되고 있다. ([출처](https://developer.mozilla.org/ko/docs/Web/API/Service_Worker_API))
+
+      - 높은 비용의 계산을 처리할 때
+      - 푸시 이벤트를 생성할 때
+      - 백그라운도 데이터 동기화
+      - 다른 출처에서의 리소스 요청을 응답
+      - 위치 정보, 자이로 센서 등 계산에 높은 비용이 들어가는 다수의 페이지에서 함께 사용할 수 있도록 데이터 업데이트를 중앙화
+      - 개발 목적으로서 CoffeeScript, Less, CJS/AMD module 등의 의존성 관리와 컴파일, 백그라운드 서비스 훅
+      - 특정 URL 패턴에 기반한 사용자 지정 템플릿 제공
+      - 성능 향상, 사진 앨범의 다음 사진 몇 장처럼 사용자가 필요로 할 것으로 생각되는 리소스의 pre-fetching 등
+  - Service Worker 는 IE 와 같은 일부 브라우저에서 지원 되지 않으며, **HTTPS** 보안 프로토콜 환경에서만 사용 가능하다. (localhost 환경 제외)
+  <br/>
+      (네트워크 중간에서 연결을 가로채고 조작하는 기능이 있기 때문)
+
+> ### 장점
+
+- 직접 Mock Server 을 구현하지 않아도 네트워크 수준에서 API를  Mocking 할 수 있다.
+- Mcoking 테스트를 위한 노드(node.js) 환경, 개발 및 디버깅을 위한 브라우저 환경에서 모두 사용할 수 있다.
+- 소스 코드 수정 없이 Mocking 이 필요한 환경에서만  MSW 인스턴스를 실행해 API Mocking을 적용할 수 있다.
+
+> ### 작동 원리
+  ![image](https://user-images.githubusercontent.com/53039583/212527387-ff907e2f-6c67-461d-80d9-fc44e1c2279b.png)
+
+1. 브라우저가 Service Worker 에 요청을 보냄
+2. Service Worker 가 해당 요청을 가로채서 복사함
+3. 서버에 요청을 보내지 않고, MSW 라이브러리의 핸들러와 매칭시킴
+4. MSW가 등록된 핸들러에서 모의 응답(mocked response)를 Service Worker에게 전달함
+5. 마지막으로 Service Worker 가 모의 응답을 브라우저에게 전달함
+
+참고로, Service Worker 는 **브라우저 환경**에서만 실행 가능하다. 
+node 환경에서는 node-request-interceptor 라이브러리를 활용해 네이티브(http, https, XMLHttpRequest) 모듈을 확장해서 request를 처리 해야한다.
+
+> ### MSW 라이브러리 설치
+
+- npm 으로 설치하기
+    
+    ```bash
+    $npm install msw --save-dev  
+    ```
+    
+- yarn 으로 설치하기
+    
+    ```bash
+    $yarn add msw --dev  
+    ```
+    
+
+> ### MSW 사용 환경 셋팅하기
+
+1. **브라우저에 서비스 워커 등록**
+→ 브라우저에서 사용하기 위해서는 MSW를 서비스 워커에 등록하는 과정이 필요한데, 아래의 명령어를 실행하면 서비스 워커 등록을 위한 파일이 public 폴더에 추가된다.
+`public/` 폴더는 주로 프로젝트의 정적 리소스를 담는 폴더이다. 
+
+    create-react-app, next.js 에 기본적으로 세팅이 되어 있지만, 다른 프로젝트의 경우 public 디렉토리가 다를 수 있는데, [해당 링크](https://mswjs.io/docs/getting-started/integrate/browser#where-is-my-public-directory)에서 참고 가능하다.
+    
+    ```bash
+    $npx msw init public/ --save
+    ```
+    
+
+1. Worker 설정
+    
+    → `src/mocks/browser.js` 파일을 생성해서 worker 설정을 해야한다.
+    
+    ```bash
+    $touch src/mocks/browser.js
+    ```
+    
+    생성한 `browser.js`파일에서 worker 인스턴스를 생성하고 요청 핸들러를 정의한다.
+    
+    ```jsx
+    // src/mocks/browser.js
+    import { setupWorker } from 'msw'
+    import { handlers } from './handlers'
+    
+    // 이것은 주어진 요청 핸들러들로 하나의 서비스 워커를 구성한다.
+    export const worker = setupWorker(...handlers)
+    ```
+    
+
+1. Worker 실행
+    
+    → 어플리케이션 소스에 워커를 실행하는 코드를 추가한다.
+    
+    ```jsx
+    // src/index.js
+    import React from 'react'
+    import ReactDOM from 'react-dom'
+    import App from './App'
+    
+    if (process.env.NODE_ENV === 'development') {
+    	const { worker } = require('./mocks/browser');
+    	worker.start();
+    };
+    
+    ReactDOM.render(<App />, document.getElementById('root'));
+    
+    ```
+    
+
+1. Worker 적용 확인
+    
+    → 애플리케이션을 다시 시작하고, 브라우저 콘솔에서 아래와 같은 메세지가 뜨면 Mocking이 활성화 된 것이다.
+    
+    ```bash
+    [MSW] Mocking enabled.
+    ```
+    
+    이제 개발 서버에서 앱을 실행하면, 실제 서버가 아닌 MSW 에서 응답을 보낼 수 있게 된다.
+    
+
+> ### MSW 요청 핸들러 작성
+
+MSW 환경 세팅이 완료되면, 서버 대신 MSW 에서 모의 응답을 줄 수 있도록 요청 핸들러를 작성한다. HTTP request가 수신되었을 때, 내가 원하는 대로 임의 응답(Mocked response) 을 해줄 수 있는 핸들러 코드이다.
+
+코드는 되도록이면 `mocks` 폴더에 두는 것이 좋다. `src/mocks/handlers.js` 에 요청 핸들러를 작성해보도록 한다.
+
+```jsx
+// src/mocks/handlers.js
+
+import { rest } from 'msw';
+
+const posts = ["post1", "post2", "post3"];
+
+export const handlers = [
+
+	// post 목록 조회
+	rest.get("/posts", (req, res, ctx) => {
+		return res(ctx.status(200), ctx.json(posts));
+	});
+
+	// post 추가
+	rest.post("/posts", (req, res, ctx) => {
+		posts.push(req.body);
+		return res(ctx.status(201));
+	});
+];
+```
+
+REST API를 Mocking 하기 위해 MSW의 `rest`  객체를 사용하였다.
+
+post 목록을 조회하기 위한 `GET /posts` 는 Array에 담긴 post를 response 해주고, 새로운 post 등록을 위한 `POST /posts` 는 request body로 넘어온 post를 Array에 추가한다.
+
+> ### Service Worker  요청 테스트
+
+이제 `fetch()` 함수로 `GET /posts` request를 보내보도록 한다. 실제 서버가 아닌 MSW에서 mocked response을 보내줄 것이다.
+
+- Request
+    
+    ```jsx
+    fetch("/posts")
+    	.then((response) => response.json())
+    	.then((data) => console.log(data));
+    ```
+    
+- Response
+    
+    ```bash
+    [MSW] 18:04:24 GET /posts (200 OK)
+    ["post1", "post2", "post3"]
+    ```
+    
+
+> ### MSW 적용 예시
+
+그렇다면 모의 응답을 제공하는 msw 핸들러는 과연 어떻게 생겼을까?  [공식 도큐](https://mswjs.io/docs/#how-does-it-work)의 예시를 통해서 먼저 알아보자.
+
+Mock Service Worker를 사용하면 선언적 [요청 핸들러](https://mswjs.io/docs/basics/request-handler) (declarative request handler)를 사용하여 URL, RegExp 또는 사용자 지정 기준에 따라 요청을 가로챌 수 있게 하고, 모의 응답을 반환하는 응답 함수를 제공한다.
+
+다음은 POST 메서드의 `/login` 요청을 모킹하는 msw 파일예시다.
+
+```jsx
+// src/mocks.js
+import { setupWorker, rest } from 'msw'
+
+const worker = setupWorker(
+  rest.post('/login', (req, res, ctx) => {
+    const isAuthenticated = sessionStorage.getItem('username')
+
+    if (!isAuthenticated) {
+      return res(
+        ctx.status(403),
+        ctx.json({
+          errorMessage: 'Not authenticated',
+        }),
+      )
+    }
+
+    return res(
+      ctx.json({
+        firstName: 'John',
+      }),
+    )
+  }),
+)
+
+// Register the Service Worker and enable the mocking
+worker.start()
+```
+
+- HTTP POST 요청을 처리하기 위해 `rest.post` 함수를 사용해 요청을 보낸다.
+- 핸들러 함수의 첫번째 파라미터에는 `'/login'` 라는 요청 경로를 넣었고, 두번째 파라미터에는 [response resolver](https://mswjs.io/docs/getting-started/mocks/rest-api#response-resolver)라는 콜백 함수를 넣었다.
+- Response resolver에는 세 가지 인자를 받는다: req, res, ctx
+    - `req`: 매칭되는 요청에 대한 정보
+    - `res`: 모의 응답을 만들 수 있는 유틸리티
+    - `ctx`: 모의 응답의 HTTP 상태 코드, 헤더, 바디 등을 만들 수 있는 함수들
+- 위 `req`, `res`, `ctx`를 사용해서 원하는 조건에 따라 모의 응답을 작성한다.
+    - 사용자가 검증되었는지 `isAuthenticated` 여부를 세션 스토리지의 username 값으로 판별한다
+    - 만약 검증된 사용자라면 `firstName: 'John'` 이라는 값을 리턴한다
+    - 만약 검증되지 않았다면, 403 응답과 함께 `errorMessage: 'Not authenticated'` 이라는 값을 리턴한다.
+- 최종적으로, 작성한 worker를 `worker.start()`로 등록한다
+
+브라우저별로 세팅 절차가 다르기 때문에 [공식 도큐 - Integrate](https://mswjs.io/docs/getting-started/integrate) 내용을 확인해서 세팅하면 된다. 해당 글에서는 '브라우저' 기준으로 msw를 적용할것이다.
+
+## MSW 다양한 사례
+
+기본적인 내용 이외에도 다양한 케이스에서 [msw를 활용할 수 있는 방법](https://mswjs.io/docs/recipes)들이 있다. 이중, 유용하게 사용할 수 있는 네 가지 사례를 정리해보았다.
+
+> ### Cookies
+
+보안상의 이유로`fetch`에서 Set-Cookie 및 Set-Cookie2 헤더를 설정할 수 없다.
+
+그러나 Mock Service Worker는 클라이언트 측에서 실행되므로, 보안 위반 없이 응답으로부터 Mocked 쿠키를 수신하는 것과 유사한 기능을 제공할 수 있다. `document.cookie` 문자열에 지정된 쿠키를 직접 설정하는 `ctx.cookie()` 응답 변환기 함수(response transformer function)를 사용하면 된다.
+
+**예시**
+
+```jsx
+import { setupWorker, rest } from 'msw'
+
+const worker = setupWorker(
+  rest.post('/login', (req, res, ctx) => {
+    return res(
+      // Calling `ctx.cookie()` sets given cookies
+      // on `document.cookie` directly.
+      ctx.cookie('auth-token', 'abc-123'),
+    )
+  }),
+)
+
+worker.start()
+```
+
+> ### Query parameters
+
+인터셉트된 요청의 쿼리 매개 변수에 액세스하려면 `req.url` 인스턴스에서 `searchParams` 속성을 사용하면 된다. 이 속성의 값은 모든 쿼리 매개 변수를 포함하는 [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) 인스턴스이다.
+
+예를 들어, MSW로 테스트를 할 때 요청 파라미터에 따라 다른 응답을 줘야하는 경우가 있는데, 이때 핸들러에서 `req` 객체를 통해 파라미터에 접근이 가능하다.
+
+```jsx
+import { setupWorker, rest } from 'msw'
+const worker = setupWorker(
+  rest.get('/products', (req, res, ctx) => {
+    const productId = req.url.searchParams.get('id')
+    return res(
+      ctx.json({
+        productId,
+      }),
+    )
+  }),
+)
+worker.start()
+```
+
+**Request**
+
+`GET fetch('/products?id=123')`
+
+**Response**`200 OK`
+
+**Body**
+
+```bash
+{
+  // Where '123' is the value of `req.url.searchParams.get('id')`
+  // parsed from the request URL.
+  "productId": "123"
+}
+```
+
+더 자세한 설명은 [링크](https://mswjs.io/docs/recipes/query-parameters)에서 확인할 수 있다.
+
+> ### Response patching
+
+Response patching은 모의 응답(mocked response)이 실제 응답을 기반으로 데이터를 구성할 수 있게한다. 이 기법은 핸들러에서 실제 서버에 요청을 보낸 후 받은 데이터에 디버깅 등에 필요한 정보를 임의로 덧붙이는 방식으로 작동한다.
+
+아래는 [Github API v3](https://docs.github.com/en/rest)에서 응답을 패칭하는 예시이다:
+
+```jsx
+import { setupWorker, rest } from 'msw'
+
+const worker = setupWorker(
+  rest.get('https://api.github.com/users/:username', async (req, res, ctx) => {
+    // Perform an original request to the intercepted request URL
+    const originalResponse = await ctx.fetch(req)
+    const originalResponseData = await originalResponse.json()
+
+    return res(
+      ctx.json({
+        location: originalResponseData.location,
+        firstName: 'Not the real first name',
+      }),
+    )
+  }),
+)
+
+worker.start()
+```
+
+**Request**
+
+`GET 'https://api.github.com/users/octocat'`
+
+**Response**`200 OK`
+
+**Body**
+
+```bash
+{
+  // Resolved from the original response
+  "location": "San Francisco",
+  "firstName": "Not the real first name"
+}
+```
+
+더 자세한 설명은 [링크](https://mswjs.io/docs/recipes/response-patching)에서 확인할 수 있다.
+
+> ### Mocking error responses
+
+msw로 요청에 대한 에러 응답을 mocking 할 수도 있다. 오류 응답을 예외가 아닌 실제 응답으로 처리함으로써, 표준을 준수하고 클라이언트 코드가 유효한 오류 응답을 수신하고 처리하는지 확인할 수 있다.
+
+아래는 로그인 `POST`요청에서 에러 응답을 mocking 하는 예제이다:
+
+```jsx
+import { setupWorker, rest } from 'msw'
+
+const worker = setupWorker(
+  rest.post('/login', async (req, res, ctx) => {
+    const { username } = await req.json()
+
+    return res(
+      // Send a valid HTTP status code
+      ctx.status(403),
+      // And a response body, if necessary
+      ctx.json({
+        errorMessage: `User '${username}' not found`,
+      }),
+    )
+  }),
+)
+
+worker.start()
+```
+
+**Request**
+
+`POST '/login'`
+
+**Body**
+
+```bash
+{
+  "username": "admin"
+}
+```
+
+**Response**
+
+`403 Forbidden`
+
+**Body**
+
+```bash
+{
+  "errorMessage": "User 'admin' not found"
+}
+```
+
+더 자세한 설명은 [링크](https://mswjs.io/docs/recipes/mocking-error-responses)에서 확인할 수 있다.
