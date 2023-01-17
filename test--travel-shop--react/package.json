@@ -20,7 +20,7 @@
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
-		"test": "react-scripts test",
+		"test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!axios)/\"",
 		"eject": "react-scripts eject"
 	},
 	"browserslist": {
@@ -36,6 +36,7 @@
 		]
 	},
 	"devDependencies": {
+		"@babel/cli": "^7.20.7",
 		"@babel/core": "^7.20.12",
 		"@babel/plugin-transform-modules-commonjs": "^7.20.11",
 		"@babel/plugin-transform-runtime": "^7.19.6",
