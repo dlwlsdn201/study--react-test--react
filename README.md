@@ -682,6 +682,92 @@ test.only('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
 - 테스트 코드에서 `test.only(…)` 구문 **외**에 모든 코드들
 - 테스트 코드에서  `test.skip(…)` 구문의 코드들
 
+## (실습4) 좀 더 복잡한 앱을 TDD 방식으로 개발하기
+
+> ### 목적
+
+→ 보다 더 다양한 **DOM** **Element** 테스트 
+
+→ **MSW**(Mock Service Worker)을 이용한 **백엔드 서버 통신 테스트**
+
+> ### 컨셉
+
+- 해외여행 패키지 주문 사이트
+
+> ### 주요 기능
+
+- 네 가지 나라에 대한 여행 상품 선택 기능 (image, inputNumber)
+- 여행 옵션 기능 (checkbox)
+- 총 금액 계산 기능 (여행 상품 + 옵션)
+- 주문한 내용 확인 (상품, 옵션)
+- 주문 완료 안내 및 누적 주문 정보 테이블 제공
+- 메인 페이지로 돌아가기 기능
+- 백엔드 통신 기능 (Node.js)
+
+> ### 프로세스
+
+상품 주문 → 주문 내용 확인 → 주문 완료 안내
+
+> ### 파일 구성
+
+    ![image](https://user-images.githubusercontent.com/53039583/212786604-cd5247ef-5795-49de-8dd3-c1e04be03072.png)
+
+> ### typescript + eslint + jest 환경 구성하기
+
+- 필요한 라이브러리
+	- `@babel/cli`
+	- `@babel/core`
+	- `@types/jest`
+	- `@eslint-plugin-jest-dom`
+	- `@eslint-plugin-testing-library`
+	- `@babel-preset-env`
+	- `@babel-prest-typescript`
+
+- `babel.config.js`
+    
+    ```jsx
+    module.exports = {
+    	presets: ['@babel/preset-env', '@babel/preset-typescript'],
+    	env: {
+	  test: {
+	    plugins: [
+	      '@babel/plugin-transform-modules-commonjs',
+	      '@babel/plugin-transform-runtime'
+	    ]
+	  }
+    	}
+    };
+    ```
+    
+- `jest.config.js`
+    
+    ```jsx
+    /** @type {import('jest').Config} */
+    const config = {
+    	preset: 'ts-jest',
+    	testEnvironment: 'node',
+    	transform: {
+          '^.+\\.ts?$': 'ts-jest'
+    	},
+    	transformIgnorePatterns: ['/node_modules/(?!(axios)/)']
+    };
+    
+    module.exports = config;
+    ```
+    
+
+- node_modules 로부터 라이브러리 import 에러가 발생할 경우 아래의 코드를 추가한다.
+    
+    ```json
+    // package.json
+    {
+      "script": {
+        "test": "react-scripts test -transformIgnorePatterns \"node_modules/(?!axios)/\""
+      }
+    } 
+    
+    ```
+
 # 참조
 
 ## 🔎 **MSW (Mock Service Worker)**
