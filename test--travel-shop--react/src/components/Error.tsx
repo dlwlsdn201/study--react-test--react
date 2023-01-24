@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Error = ({ message }) => {
+const Error = ({ message }: { message: string }) => {
 	const errorMessage = message || '에러입니다.';
 
 	return (
