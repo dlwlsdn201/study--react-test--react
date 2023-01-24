@@ -6,6 +6,7 @@ import axios from 'axios';
 import ErrorBanner from '../../components/Error';
 import Options from './Options';
 import { DIV_FLEX } from 'src/styles/modules';
+import { STANDARD_UNIT } from 'src/config/unit';
 
 const Type = ({ orderType }: { orderType: TOrderType }) => {
 	const [items, setItems] = useState([]);
@@ -43,7 +44,7 @@ const Type = ({ orderType }: { orderType: TOrderType }) => {
 	return (
 		<>
 			<h2>주문 종류</h2>
-			<p>하나의 가격</p>
+			<p>{STANDARD_UNIT} 500</p>
 			<p>총 가격:</p>
 			<DIV_FLEX orderType={orderType}> {optionItems}</DIV_FLEX>
 		</>

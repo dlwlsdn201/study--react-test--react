@@ -1,5 +1,5 @@
 import React from 'react';
-import { DIV_FLEX, SECTION_MODULE } from 'src/styles/modules';
+import { BUTTON_MODULE, DIV_FLEX, SECTION_MODULE } from 'src/styles/modules';
 import Type from './Type';
 
 const OrderPage = () => {
@@ -20,8 +20,9 @@ const OrderPage = () => {
 						<SECTION_MODULE>
 							<div>
 								<h2>
-									Total Price: <br /> <button>주문</button>
+									Total Price: <br />{' '}
 								</h2>
+								<BUTTON_MODULE type='button'>주문</BUTTON_MODULE>
 							</div>
 						</SECTION_MODULE>
 					</DIV_FLEX>
