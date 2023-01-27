@@ -83,6 +83,7 @@ test/
 
 ![image](https://user-images.githubusercontent.com/53039583/208230646-60ef14bc-3f8c-4de4-81ad-c7f78e162ecf.png)
 
+## 문법
 > ### 테스트 파일 코드 구조
 
 ![image](https://user-images.githubusercontent.com/53039583/208230654-6156e9ce-048d-4d90-8d93-1d0e560d70b0.png)
@@ -112,6 +113,13 @@ test/
 따라서, userEvent 는 실제 사용자가 UI를 사용하는 것 같은 이벤트들을 디테일하게 표현해준다.
 
 사용 추천 순위 : ***userEvent > fireEvent***
+
+> ### userEvent.clear()
+
+input 이나 textarea에 `텍스트를 선택한 후 제거`해준다.
+
+만약 현재 소스 코드보다 위에서 같은 엘리먼트를 위한 `userEvent` 를 사용했다면 `clear` 해준 후에  `userEvent.type()`을 사용하는게 좋다.
+#
 
 ## React Testing Library  와 Jest 의 비교
 
@@ -768,6 +776,46 @@ test.only('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
     
     ```
 
+## context API 을 이용하여 react에서 전역적으로 state를 관리하기
+
+> ### 1. Context 파일 생성
+
+- 전역적으로 관리할 state 을 정의하는 곳
+- 정의한 state을 사용할 수 있도록 전달해주는 `Provider` 메서드를 정의하는 곳
+- 보통 `./src/contexts/...` 경로에 파일을 생성한다.
+    
+    ```jsx
+    const { createContext, useMemo, useState } = require('react');
+    
+    // Context API 의 인스턴스 생성 
+    export const Context = createContext();
+    
+    // state을 제공해줄 Provider 인스턴스
+    export const OrderContextProvider = (props) => {
+    	const [state, setState] = useState(undefined); // 전역적으로 사용될 state
+    
+    	return <Context.Provider value={state}/>
+    }
+    ```
+    
+- 만약 렌더링 성능을 올리고 싶다면, value 로 전달되는 state 값을 `useMemo` 라는 Hook 함수를 사용하여 전달한다.
+    
+    그 이유는, value 값이 바뀌면 <Provider/> 내부에 있는 모든 컴포넌트들이 Re-rendering  이 발생하는데, 이 useMemo을 사용하면 dependency Array 내에 있는 값이 바뀌었을 때만 Re-rendering 이 발생하기 때문에 약간의 성능 향상을 기대할 수 있다. 
+    
+    ```jsx
+    export const OrderContextProvider = (props) => {
+    	const [state, setState] = useState(undefined); // 전역적으로 사용될 state
+    
+    // state가 변경 되었을 때만, useMemo {...} 내부 코드를 최신화
+    	const value = useMemo(() => {
+        return [{...state}]
+      }, [state]);
+    
+    	return <Context.Provider value={value}/>
+    }
+    ```
+
+#
 # 참조
 
 ## 🔎 **MSW (Mock Service Worker)**
