@@ -815,8 +815,172 @@ test.only('on/off 버튼 클릭 시, +,- 버튼을 disabled 처리', () => {
     }
     ```
 
+## Test 시, render 컴포넌트에 wrapper 컴포넌트 적용하기
+
+React test 시, render 의 타겟이 되는 컴포넌트의 상위 컴포넌트도 같이 rendering 되어야 하는 상황들이 종종 있다. (ex_Context API 을 사용할 때, <Provider/> 등) 
+
+이런 상황일 때는, `render()`  컴포넌트의 두 번째 파라미터로 `{wrapper: 컴포넌트명}` 을 정의하여, 테스트 렌더링 시에도 부모 컴포넌트를 같이 rendering할 수 있다.
+
+```jsx
+it("it is Context API data", async () => {
+	render(<Type/>, { wrapper: OrderContextProvider });
+})
+```
+
+> ### 모든 render 컴포넌트에 wrapper 컴포넌트를 적용하기 위한 custom render 함수 만들기
+
+테스트 코드에서 다수의 render 컴포넌트에 공통적인 wrapper 컴포넌트를 적용해야할 경우, 일일이 `{wrapper: 컴포넌트명}` 파라미터를 정의하는 것보다는 하나의 커스텀 render 함수를 만드는 것이 훨씬 효율적일 수 있다.
+
+```jsx
+// src/test-utils.js
+
+import { render } from '@testing-library/react';
+import { ContextProvider } from './contexts/Context'; // Context Provider 컴포넌트
+
+// ui : render 하고자 하는 타겟 컴포넌트 
+// options : wrapper 옵션 외 사용자가 정의 하고싶은 option
+const customRender = (ui, options) => render(ui, { wrapper: ContextProvider, ...options }; 
+
+// RTL 라이브러리를 re-export
+export * from '@testing-library/test';
+
+// override render method (테스트 코드에서 커스텀 렌더 함수를 render 라는 명으로 import 하여 사용할 수 있도록)
+export { customRender as render };
+```
+
+```jsx
+// cacluate.test.js 
+
+import { render, screen } from '../../../test-utils'; // test-utils.js 에서 import 
+import userEvent from '@testing-library/user-event';
+import Type from '../Type';
+
+// 상품 구매 수량이 업데이트 될 때, 총 상품 합계 업데이트 기능 테스트
+it('update product total when products change', async () => {
+	render(<Type orderType='products' />); // { wrapper: ContextProvider } 옵션이 기본으로 적용되어 rendering
+	(...)
+});
+```
+
+# ⚠️ Test Errors
+
+## Context API 에 대한 Test Error 발생 원인
+
+아래의 에러 원인은 실제 <Type/> 이라는 컴포넌트를 렌더링 할 때 Context Provider 컴포넌트로 감싸져있는 상태로 렌더링 되지만, 테스트 할 때는 `render(<Type *orderType*='products' />);` 코드로 작성하여 Provider 컴포넌트로 감싸지 않은 상태로 렌더링 되어, context state 를 사용할 수 없기 때문이다.
+
+![image](https://user-images.githubusercontent.com/53039583/216755337-d24afb8b-f757-4c24-a5d5-a81f7acd7de9.png)
+
+따라서, 해당 에러를 해결하기 위해서는 아래와 같이 테스트 코드에서 `render()` 메서드의 두 번째 파라미터로 `{wrapper: <Context Provider명>}` 을 정의하여, 테스트 렌더링 시에도 Context 의 Provider 컴포넌트가 감싸질 수 있도록 하면 된다.
+
+
 #
 # 참조
+
+## 🔎 Javascript 의 Map
+
+- Map 객체는 [key, value] 형태의 값을 가지는 객체이다.
+- key는 Map 객체에서 고유해야 하며, value는 변경 가능하다.
+- Map 은 key 가 있는 data 를 저장한다는 점에서 Object와 유사하지만, 다양한 자료형을 허용한다는 점에서 차이가 있다.
+
+### Map을 사용하면 좋은 상황
+
+- 객체의 property를 자주 변경해야할 때 유용하다. (자주 변경되지 않는 정보들은 일반 object 객체에 저장해도 상관없다)
+
+### 맵을 생성하기
+
+```jsx
+new Map()
+```
+
+### key를 이용하여 value를 저장하는 `set(key, value)`
+
+```jsx
+const map = new Map();
+
+map.set('1', 'str1');
+map.set('name', 'Lee');
+
+console.log(map);  // {{'1' => 'str1'}, {'name' => 'Lee'}}
+```
+
+### key에 해당하는 값을 반환하는 `get(key)`
+
+- `key`에 대한 value가 존재하지 않으면,  `undefined` 를 return 한다.
+
+```jsx
+const map = new Map();
+
+map.set('1', 'str1');
+map.set('name', 'Lee');
+
+console.log(map.get('name')); // 'Lee'
+```
+
+### key가 존재 여부에 따라 bool 타입의 결과를 반환하는 `has(key)`
+
+```jsx
+const map = new Map();
+
+map.set('1', 'str1');
+map.set('name', 'Lee');
+
+console.log(map.has('1')); // true
+console.log(map.has('2')); // false
+```
+
+### key에 해당하는 객체를 삭제하는 `delete(key)`
+
+```jsx
+const map = new Map();
+
+map.set('1', 'str1');
+map.set('name', 'Lee');
+
+map.delete('name');
+
+console.log(map);  // {{'1' => 'str1'}}
+```
+
+### Map 안의 모든 요소를 제거하는 `clear()`
+
+```jsx
+const map = new Map();
+
+map.set('1', 'str1');
+map.set('name', 'Lee');
+
+map.clear();
+
+console.log(map);  // {size: 0}
+```
+
+### Map 안에 있는 요소 개수를 반환하는 `size`
+
+```jsx
+const map = new Map();
+
+map.set('1', 'str1');
+map.set('name', 'Lee');
+
+console.log(map.size);  // 2
+```
+
+## 🔎  Javascript 에서 For 문을 좀 더 섹시하게 사용하기
+
+```jsx
+for (const 변수 of [배열]) {
+	// 반복 실행 구문
+}
+```
+
+## 🔎  타입스크립트에서 change event 의 Type 지정하기
+
+```tsx
+// Input 태그 요소에 대한 onChange 이벤트 핸들러 함수를 정의할 때
+const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+	setState(e.target.value);
+}
+```
 
 ## 🔎 **MSW (Mock Service Worker)**
 
