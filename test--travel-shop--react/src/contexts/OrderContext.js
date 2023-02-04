@@ -2,7 +2,7 @@ const { createContext, useMemo, useState, useEffect } = require('react');
 
 export const OrderContext = createContext();
 
-const pricePerItem = {
+export const pricePerItem = {
 	products: 1000,
 	options: 500
 };
@@ -13,7 +13,7 @@ function calculateSubtotal(orderType, orderCounts) {
 		optionCounts += count;
 	}
 
-	return optionCounts + pricePerItem[orderType];
+	return optionCounts * pricePerItem[orderType];
 }
 
 export const OrderContextProvider = (props) => {

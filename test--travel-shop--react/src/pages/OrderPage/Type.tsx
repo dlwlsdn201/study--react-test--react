@@ -1,5 +1,5 @@
 import { TOption, TOrderType } from '../../../types';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useState } from 'react';
 import Products from './Products';
 import axios from 'axios';
@@ -7,10 +7,12 @@ import ErrorBanner from '../../components/Error';
 import Options from './Options';
 import { DIV_FLEX } from 'src/styles/modules';
 import { STANDARD_UNIT } from 'src/config/unit';
+import { OrderContext, pricePerItem } from 'src/contexts/OrderContext';
 
 const Type = ({ orderType }: { orderType: TOrderType }) => {
 	const [items, setItems] = useState([]);
 	const [error, setError] = useState(false);
+	const [orderData, updateItemCount] = useContext(OrderContext);
 
 	useEffect(() => {
 		loadItems(orderType);
@@ -34,6 +36,9 @@ const Type = ({ orderType }: { orderType: TOrderType }) => {
 				key={item.name}
 				name={item.name}
 				imagePath={item.imagePath}
+				updateItemCount={(itemName: string, newItemCount: number) =>
+					updateItemCount(itemName, newItemCount, orderType)
+				}
 			/>
 		));
 
@@ -44,8 +49,12 @@ const Type = ({ orderType }: { orderType: TOrderType }) => {
 	return (
 		<>
 			<h2>주문 종류</h2>
-			<p>{STANDARD_UNIT} 500</p>
-			<p>총 가격:</p>
+			<p>
+				{STANDARD_UNIT} {pricePerItem[orderType]}
+			</p>
+			<p>
+				총 가격: {STANDARD_UNIT} {orderData.totals[orderType]}
+			</p>
 			<DIV_FLEX orderType={orderType}> {optionItems}</DIV_FLEX>
 		</>
 	);

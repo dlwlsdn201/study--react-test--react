@@ -1,6 +1,20 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
-const Products = ({ name, imagePath }: { name: string; imagePath: string }) => {
+const Products = ({
+	name,
+	imagePath,
+	updateItemCount
+}: {
+	name: string;
+	imagePath: string;
+	updateItemCount: Function;
+}) => {
+	// 특정 상품에 대한 수량을 업데이트 하는 함수
+	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const currentValue = event.target.value;
+		updateItemCount(name, currentValue);
+	};
+
 	return (
 		<div style={{ textAlign: 'center' }}>
 			<img
@@ -16,6 +30,7 @@ const Products = ({ name, imagePath }: { name: string; imagePath: string }) => {
 					name='quantity'
 					min='0'
 					defaultValue={0}
+					onChange={handleChange}
 				/>
 			</form>
 		</div>
