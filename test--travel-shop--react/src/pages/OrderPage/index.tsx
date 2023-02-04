@@ -20,7 +20,7 @@ const OrderPage = () => {
 						<SECTION_MODULE>
 							<div>
 								<h2>
-									Total Price: <br />{' '}
+									상품 총 가격: <br />{' '}
 								</h2>
 								<BUTTON_MODULE type='button'>주문</BUTTON_MODULE>
 							</div>
