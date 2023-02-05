@@ -46,6 +46,7 @@ const Type = ({ orderType }: { orderType: TOrderType }) => {
 		return <ErrorBanner message='에러가 발생했습니다.' />;
 	}
 
+	const orderTypeKorean = orderType === 'products' ? '상품' : '옵션';
 	return (
 		<>
 			<h2>주문 종류</h2>
@@ -53,7 +54,7 @@ const Type = ({ orderType }: { orderType: TOrderType }) => {
 				{STANDARD_UNIT} {pricePerItem[orderType]}
 			</p>
 			<p>
-				총 가격: {STANDARD_UNIT} {orderData.totals[orderType]}
+				{orderTypeKorean} 총 가격: {STANDARD_UNIT} {orderData.totals[orderType]}
 			</p>
 			<DIV_FLEX orderType={orderType}> {optionItems}</DIV_FLEX>
 		</>

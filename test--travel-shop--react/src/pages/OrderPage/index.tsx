@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { OrderContext } from 'src/contexts/OrderContext';
 import { BUTTON_MODULE, DIV_FLEX, SECTION_MODULE } from 'src/styles/modules';
 import Type from './Type';
 
 const OrderPage = () => {
+	const [totalData, updateitemCount] = useContext(OrderContext);
+
 	return (
 		<div>
 			<header>
@@ -20,7 +23,8 @@ const OrderPage = () => {
 						<SECTION_MODULE>
 							<div>
 								<h2>
-									상품 총 가격: <br />{' '}
+									합계: {totalData.totals.total}
+									<br />{' '}
 								</h2>
 								<BUTTON_MODULE type='button'>주문</BUTTON_MODULE>
 							</div>
