@@ -861,6 +861,66 @@ it('update product total when products change', async () => {
 	(...)
 });
 ```
+> ### 선택한 여행 상품과 옵션들의 총 합계를 계산 하는 기능 테스트 코드 작성하기
+![image](https://user-images.githubusercontent.com/53039583/216804181-26f49d8a-c1d4-4c3c-add6-02204583e98b.png)
+
+
+```jsx
+describe('total price of goods and options', () => {
+// 1. 최초 총 합계는 0이먀, 여행 상품을 선택할 때 총 합계 값을 테스트 
+	it('total price starts with 0 and Updating total price when adding one product', async () => {
+		render(<OrderPage />);
+
+		const total = screen.getByText('합계:', { exact: false });
+		expect(total).toHaveTextContent('0');
+
+		const americaInput = await screen.findByRole('spinbutton', {
+			name: 'America'
+		}); // 백엔드에서 가져온 후 보여지는 요소이기 때문에 await 사용
+		userEvent.clear(americaInput);
+		userEvent.type(americaInput, '3');
+
+		userEvent.clear(americaInput);
+		userEvent.type(americaInput, '1');
+
+		expect(total).toHaveTextContent('1000');
+	});
+
+// 2. 옵션 1개를 추가하였을 때 총 합계 계산 테스트
+	it('Updating total price when adding one option', async () => {
+		render(<OrderPage />);
+		const total = screen.getByText('합계:', { exact: false });
+
+		const insuranceCheckbox = await screen.findByRole('checkbox', {
+			name: 'Insurance'
+		});
+		userEvent.click(insuranceCheckbox);
+		expect(total).toHaveTextContent('500');
+	});
+
+// 3. 옵션 1개를 취소했을 때 총 합계 계산 테스트
+	it('Updating total price when removing option and product', async () => {
+		render(<OrderPage />);
+
+		const total = screen.getByText('합계:', { exact: false });
+
+		const insuranceCheckbox = await screen.findByRole('checkbox', {
+			name: 'Insurance'
+		});
+		userEvent.click(insuranceCheckbox);
+
+		const americaInput = await screen.findByRole('spinbutton', {
+			name: 'America'
+		});
+		userEvent.clear(americaInput);
+		userEvent.type(americaInput, '3');
+
+		userEvent.clear(americaInput);
+		userEvent.type(americaInput, '1');
+		expect(total).toHaveTextContent('1500');
+	});
+});
+```
 
 # ⚠️ Test Errors
 
