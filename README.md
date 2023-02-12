@@ -95,6 +95,12 @@ test/
     - `test.only()` : 해당 test() 구문만 실행한다. (나머지 test구문은 skip).
 - `expect` : 값을 테스트할 때마다 사용된다. 그리고 expect  함수 혼자서는 거의 사용되지 않고, **matcher 와 함께 사용된다.**
 - `matcher` : expect 에 대한 결과 도출을 위해 테스트 방식을 정의하는 함수
+  - `.toHaveStyle()` : 특정 Dom Element 요소에 대한 style 속성값 여부 테스트
+  - `.toBeDisabled()` : 특정 Dom Element 요소에 대한 disabled 속성값 테스트
+  - `.toHaveTextContent()` : 특정 Dom Element 요소의 textContent 에 대한 값 테스트
+  - `.toBeTruthy()` : expect 인스턴스 return 이 true 인지 여부를 테스트 
+  <br/>( false 인 경우 : **false | 0 | '' | null | undefined | NaN** )
+  - `.toEqual(VALUE)` : expect 인스턴스 return 값과 `VALUE` 값이 동일한지 여부를 테스트
     
     ![image](https://user-images.githubusercontent.com/53039583/208230671-9ad88ea7-e64a-47b5-81ed-df3c11ee1992.png)
     
@@ -921,6 +927,116 @@ describe('total price of goods and options', () => {
 	});
 });
 ```
+#
+> ### 선택한 여행상품들과 옵션 내역들을 최종 확인하는 페이지의 테스트 코드 구현하기
+
+- 최종 확인 페이지에 대한 테스트 코드
+    
+    ```jsx
+    // src/pages/SummaryPage/tests/SummaryPage.test.js
+    
+    import { render, screen } from 'src/test-utils';
+    import SummaryPage from '../SummaryPage';
+    
+    it('checkbox and button', () => {
+    	render(<SummaryPage />);
+    
+    // <Input type="checkbox" name="주문하려는 것을 확인하셨나요?"/> 이라는 Element 요소
+    	const checkbox = screen.getByRole('checkbox', {
+    		name: '주문하려는 것을 확인하셨나요?'
+    	});
+    
+    	expect(checkbox.checked).toEqual(false); // 최초 렌더링 시, 체크박스 값은 false 이어야함.
+    
+    // <button name="주문 확인"/> 이라는 Element 요소
+    	const confirmButton = screen.getByRole('button', {
+    		name: '주문 확인'
+    	});
+    	expect(confirmButton.disabled).toBeTruthy(); // 최초 렌더링 시, 체크박스 값은 false 이어야함.
+    });
+    ```
+    
+
+- 상품 주문 → 최종 확인 프로세스에 대한 테스트 코드
+    
+    ```jsx
+    // src/App.test.js
+    
+    import { render, screen } from '@testing-library/react';
+    import userEvent from '@testing-library/user-event';
+    import App from './App';
+    
+    test('From order to order completion', async () => {
+    	render(<App />);
+    
+    	////////////////// [주문 페이지] //////////////////
+    
+    	// '미국' 상품 선택 수량 Input Element
+    	const americaInput = await screen.findByRole('spinbutton', {
+    		name: 'America'
+    	});
+    
+    	userEvent.clear(americaInput);
+    	userEvent.type(americaInput, '2'); // 미국 상품 수량 Input 요소에 value: '2' 을 입력
+    
+      // '영국' 상품 선택 수량 Input Element
+    	const englandInput = await screen.findByRole('spinbutton', {
+    		name: 'England'
+    	});
+    
+    	userEvent.clear(englandInput);
+    	userEvent.type(englandInput, '3'); // 영국 상품 수량 Input 요소에 value: '3' 을 입력
+    
+    	// '보험' 옵션 선택 Checkbox Element
+    	const insuranceCheckbox = await screen.findByRole('checkbox', {
+    		name: 'Insurance'
+    	});
+    
+    	// 체크박스 요소에 체크 이벤트 발생
+    	userEvent.click(insuranceCheckbox);
+    
+    	const orderButton = screen.getByRole('button', {
+    		name: '주문하기'
+    	});
+    
+    	// [주문하기] 버튼 클릭
+    	userEvent.click(orderButton);
+    
+    	////////////////// [주문 확인 페이지] //////////////////
+    	const summaryHeading = screen.getByRole('heading', { // <h$ name="주문 확인"></h$> 이라는 Element 요소
+    		name: '주문 확인'
+    	});
+    	expect(summaryHeading).toBeInTheDocument(); // <h$ name="주문 확인"></h$> 이라는 태그가 document 에 존재하는가?
+    
+    	const productHeading = screen.getByRole('heading', {  // <h$ name="여행 상품: 5000"></h$> 이라는 Element 요소
+    		//
+    		name: '여행 상품: 5000'
+    	});
+    	expect(productHeading).toBeInTheDocument(); // <h$ name="여행 상품: 5000"></h$> 이라는 태그가 document 에 존재하는가? (Refer: 8~20 line)
+    
+    	const optionsHeading = screen.getByRole('heading', { // <h$ name="옵션: 500"></h$> 이라는 Element 요소
+    		name: '옵션: 500'
+    	});
+    	expect(optionsHeading).toBeInTheDocument(); // <h$ name="옵션: 500"></h$> 이라는 태그가 document 에 존재하는가? (Refer: 22~27 line)
+    
+    	expect(screen.getByText('2 America')).toBeInTheDocument(); // document 안에 '2 America' 라는 텍스트가 존재하는가?
+    	expect(screen.getByText('3 England')).toBeInTheDocument(); // document 안에 '3 England' 라는 텍스트가 존재하는가?
+    	expect(screen.getByText('Insurance')).toBeInTheDocument(); // document 안에 'Insurance' 라는 텍스트가 존재하는가?
+    
+    	// <input type='checkbox' name="주문하려는 것을 확인하셨나요?"/> Element 요소
+    	const confirmCheckbox = screen.getByRole('checkbox', {
+    		name: '주문하려는 것을 확인하셨나요?'
+    	});
+    
+    	userEvent.click(confirmCheckbox); // 체크박스 클릭
+    
+    	// <button name="주문 확인"/> Element 요소
+    	const confirmOrderButton = screen.getByRole('button', {
+    		name: '주문 확인'
+    	});
+    	userEvent.click(confirmOrderButton); // 버튼 클릭
+    });
+    ```
 
 # ⚠️ Test Errors
 
@@ -935,6 +1051,22 @@ describe('total price of goods and options', () => {
 
 #
 # 참조
+
+## 🔎 Javascript 의 Array.from(Map object)
+
+ 유사 배열 객체(array-like object)나 반복 가능한 객체(iterable object)를 얕게 복사해 새로운`Array` 객체를 만든다.
+
+```jsx
+console.log(Array.from('foo'));
+// Expected output: Array ["f", "o", "o"]
+
+console.log(Array.from([1, 2, 3], x => x + x));
+// Expected output: Array [2, 4, 6]
+
+const mapObejct = new Map([['name', 'lee'], ['name', 'kim']]);
+console.log(Array.from(mapObject);
+// Expected output: [['name', 'lee'], ['name', 'kim']]
+```
 
 ## 🔎 Javascript 의 Map
 
