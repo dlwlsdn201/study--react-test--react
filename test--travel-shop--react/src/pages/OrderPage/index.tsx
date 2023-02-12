@@ -28,7 +28,7 @@ const OrderPage = () => {
 									<br />{' '}
 								</h2>
 								<BUTTON_MODULE type='button' onClick={nextStep}>
-									주문
+									주문하기
 								</BUTTON_MODULE>
 							</div>
 						</SECTION_MODULE>
