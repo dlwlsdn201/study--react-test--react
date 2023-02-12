@@ -1,8 +1,10 @@
 import './App.css';
-import { OrderContext, OrderContextProvider } from './contexts/OrderContext';
+import { OrderContextProvider } from './contexts/OrderContext';
 import OrderPage from './pages/OrderPage';
+import commonStore from './store/common';
 
 function App() {
+	const { step } = commonStore();
 	return (
 		<div style={{ padding: '1em' }}>
 			<OrderContextProvider>
