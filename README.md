@@ -1047,8 +1047,132 @@ describe('total price of goods and options', () => {
     		name: '주문 확인'
     	});
     	userEvent.click(confirmOrderButton); // 버튼 클릭
+
+      // ---- 아래 구문이 없으면 not wrapped in act(...) ... 에러가 발생함 ---- 
+      // (reason: [주문 확인] 버튼을 클릭하면, 리액트는 첫 페이지에 대한 컴포넌트들이 다시 렌더링 될 것으로 예상하지만, 테스트 코드에서는 [주문 확인] 버튼 클릭 후 테스트를 종료하기 때문)
+      // case 1 과 case 2 는 같은 기능을 하는 코드이기 때문에 사용자가 편한 방식으로 사용하면 됨. (wait + get = find)
+
+      // case 1
+      /*
+        await waitFor(() => {
+          screen.getByRole('spinbutton', { name: 'America' });
+        });
+      */
+
+      // case 2
+        await screen.findByRole('spinbutton', { name: 'America' });
     });
     ```
+
+## state reset 을 위한 테스트 코드 작성하기
+
+여행 상품 앱에서 주문 후, 첫 페이지로 되돌아가면 상품 및 총 주문 금액에 대한 state가 초기화 되지 않는 이슈가 발생하였다.
+
+![image](https://user-images.githubusercontent.com/53039583/219924793-bddeb2eb-aba4-4f16-9f0a-cf1a0a8ab368.png)
+
+![image](https://user-images.githubusercontent.com/53039583/219924816-27f52a84-002c-499e-9179-d309faf7ae22.png)
+
+따라서, 첫 페이지로 돌아갈 때 상품, 옵션에 대한 총 가격  state를 reset 해주는 함수 구현과 초기화 여부 테스트 코드 작성 두 가지가 필요하였다.
+
+- state reset 함수 구현
+    
+    ```jsx
+    // src/contexts/OrderContext.js
+    
+    const { createContext, useMemo, useState, useEffect } = require('react');
+    
+    export const OrderContext = createContext();
+    
+    export const pricePerItem = {
+    	products: 1000,
+    	options: 500
+    };
+    
+    function calculateSubtotal(orderType, orderCounts) {
+    	let optionCounts = 0;
+    	for (const count of orderCounts[orderType].values()) {
+    		optionCounts += count;
+    	}
+    
+    	return optionCounts * pricePerItem[orderType];
+    }
+    
+    export const OrderContextProvider = (props) => {
+    	const [orderCounts, setOrderCounts] = useState({
+    		products: new Map(),
+    		options: new Map()
+    	});
+    
+    	const [totals, setTotals] = useState({
+    		products: 0,
+    		options: 0,
+    		total: 0
+    	});
+    
+    // 총 가격, 선택 상품 초기화 함수 
+    +	const resetOrderCounts = () => {
+    +		setOrderCounts({
+    +			products: new Map(),
+    +			options: new Map()
+    +		});
+    +	};
+    
+    	useEffect(() => {
+    		const productsTotal = calculateSubtotal('products', orderCounts);
+    		const optionsTotal = calculateSubtotal('options', orderCounts);
+    		const total = productsTotal + optionsTotal;
+    
+    		setTotals({
+    			products: productsTotal,
+    			options: optionsTotal,
+    			total
+    		});
+    	}, [orderCounts]);
+    
+    	const value = useMemo(() => {
+    		/**
+    		 *
+    		 * @param {string} itemName 상품명 (America, England 등)
+    		 * @param {number} newItemCount 상품 수량
+    		 * @param {'products' | 'options'} orderType 데이터 타입 (상품 데이터, 옵션 데이터)
+    		 */
+    		function updateItemCount(itemName, newItemCount, orderType) {
+    			const newOrderCounts = { ...orderCounts };
+    
+    			//
+    			const orderCountsMap = orderCounts[orderType]; 
+    			orderCountsMap.set(itemName, parseInt(newItemCount)); 
+    
+    			setOrderCounts(newOrderCounts);
+    		}
+    -		return [{ ...orderCounts, totals }, updateItemCount];
+    +		return [{ ...orderCounts, totals }, updateItemCount, resetOrderCounts]; // 초기화 함수를 Consumer 컴포넌트에서 사용할 수 있도록 export 
+    	}, [orderCounts, totals]);
+    
+    	return <OrderContext.Provider value={value} {...props} />;
+    };
+    ```
+    
+    ```jsx
+    // App.test.js
+    
+    import { STANDARD_UNIT } from './config/unit';
+    
+    (...)
+    // 5. 첫 페이지의 금액 state reset
+    	// 메인 여행 상품 총 가격 초기화 테스트
+    +	const productsTotal = screen.getByText(`상품 총 가격: ${STANDARD_UNIT} 0`);
+    +	expect(productsTotal).toBeInTheDocument();
+    +
+    	// 옵션 상품 총 가격 초기화 테스트
+    +	const optionsTotal = screen.getByText(`옵션 총 가격: ${STANDARD_UNIT} 0`);
+    +	expect(optionsTotal).toBeInTheDocument();
+    ```
+    
+
+위의 코드들을 토대로 다시 테스트를 실행해 본 결과, state reset 이 정상적으로 작동하는 것을 확인할 수 있었다.
+
+![image](https://user-images.githubusercontent.com/53039583/219924864-1368ff3e-322d-4db6-9c44-5cdc0b6ab6ea.png)
 
 # ⚠️ Test Errors
 
