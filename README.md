@@ -240,18 +240,23 @@ $npx create-react-app <프로젝트 폴더명>
     ```
 
 ## queryBy-
-
 → 쿼리에 대해 일치하는 노드를 return  하며, 일치하는 요소가 없으면 `null`을 반환하고 둘 이상의 일치 항목이 발견되면 설명 오류를 발생시킴.
 (둘 이상의 일치 항목이 예상되는 경우, `queryAllBy`을 사용)
 
 ## findBy-
+→ `get-` + `wait`  = `find-`
 
 → 주어진 쿼리와 일치하는 요소가 발견되면 `Promise`를 return 하며, 요소가 발견되지 않거나 기본 제한 시간인 1000ms 후에 둘 이상의 요소가 발견되면 Promise  가 거부된다. 
 (둘 이상의 요소를 find 해야 하는 경우,  `findAllBy`을 사용)
 
 ## waitFor
-
 → 일정 기간 동안 기다려야 할 때, expect() 가 통과할 때까지 기다릴 수 있다.
+
+
+## waitForElementToBeRemoved
+→ `특정 요소가 DOM에서 제거되기 까지 기다림`.
+
+→ 예시로 데이터를 송/수신 중일 때 Loading UI가 DOM 에서 사라지기 전까지 특정한 기능을 테스트 할 수 있음
 
 
 # Prettier 설치 및 설정
@@ -883,6 +888,7 @@ describe('total price of goods and options', () => {
 		const americaInput = await screen.findByRole('spinbutton', {
 			name: 'America'
 		}); // 백엔드에서 가져온 후 보여지는 요소이기 때문에 await 사용
+
 		userEvent.clear(americaInput);
 		userEvent.type(americaInput, '3');
 
@@ -900,6 +906,7 @@ describe('total price of goods and options', () => {
 		const insuranceCheckbox = await screen.findByRole('checkbox', {
 			name: 'Insurance'
 		});
+
 		userEvent.click(insuranceCheckbox);
 		expect(total).toHaveTextContent('500');
 	});
@@ -913,11 +920,13 @@ describe('total price of goods and options', () => {
 		const insuranceCheckbox = await screen.findByRole('checkbox', {
 			name: 'Insurance'
 		});
+
 		userEvent.click(insuranceCheckbox);
 
 		const americaInput = await screen.findByRole('spinbutton', {
 			name: 'America'
 		});
+
 		userEvent.clear(americaInput);
 		userEvent.type(americaInput, '3');
 
@@ -975,6 +984,7 @@ describe('total price of goods and options', () => {
     	const americaInput = await screen.findByRole('spinbutton', {
     		name: 'America'
     	});
+
     
     	userEvent.clear(americaInput);
     	userEvent.type(americaInput, '2'); // 미국 상품 수량 Input 요소에 value: '2' 을 입력
@@ -983,6 +993,7 @@ describe('total price of goods and options', () => {
     	const englandInput = await screen.findByRole('spinbutton', {
     		name: 'England'
     	});
+
     
     	userEvent.clear(englandInput);
     	userEvent.type(englandInput, '3'); // 영국 상품 수량 Input 요소에 value: '3' 을 입력
@@ -991,6 +1002,7 @@ describe('total price of goods and options', () => {
     	const insuranceCheckbox = await screen.findByRole('checkbox', {
     		name: 'Insurance'
     	});
+
     
     	// 체크박스 요소에 체크 이벤트 발생
     	userEvent.click(insuranceCheckbox);
