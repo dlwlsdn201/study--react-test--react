@@ -8,7 +8,7 @@ import completePageStore from 'src/store/completePage';
 
 const CompletePage = () => {
 	// const [loading, setLoading] = useState(false);
-	const [totalData] = useContext(OrderContext);
+	const [totalData, , resetTotalData] = useContext(OrderContext);
 	const { initStep } = commonStore();
 	const {
 		loading,
@@ -42,8 +42,13 @@ const CompletePage = () => {
 
 	if (error) return <Error message='에러가 발생했습니다.' />;
 
+	const handleClick = () => {
+		resetTotalData();
+		initStep();
+	};
+
 	if (loading) {
-		return <div>Loading</div>;
+		return <div>loading</div>;
 	} else {
 		return (
 			<div style={{ textAlign: 'center' }}>
@@ -59,7 +64,11 @@ const CompletePage = () => {
 					</tbody>
 				</table>
 				<br />
-				<button className='rainbow ranbow-1' onClick={() => initStep()}>
+				<button
+					className='rainbow rainbow-1'
+					onClick={() => {
+						handleClick();
+					}}>
 					첫페이지로
 				</button>
 			</div>

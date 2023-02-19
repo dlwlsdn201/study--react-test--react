@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import { STANDARD_UNIT } from './config/unit';
 
 test('From order to order completion', async () => {
 	render(<App />);
@@ -89,4 +90,26 @@ test('From order to order completion', async () => {
 		name: '첫페이지로'
 	});
 	userEvent.click(firstPageButton);
+
+	// 5. 첫 페이지의 금액 state reset
+
+	// 메인 여행 상품 총 가격 초기화 테스트
+	const productsTotal = screen.getByText(`상품 총 가격: ${STANDARD_UNIT} 0`);
+	expect(productsTotal).toBeInTheDocument();
+
+	// 옵션 상품 총 가격 초기화 테스트
+	const optionsTotal = screen.getByText(`옵션 총 가격: ${STANDARD_UNIT} 0`);
+	expect(optionsTotal).toBeInTheDocument();
+
+	// ---- 아래 구문이 없으면 not wrapped in act(...) ... 에러가 발생함 ----
+	// (reason: [주문 확인] 버튼을 클릭하면, 리액트는 첫 페이지에 대한 컴포넌트들이 다시 렌더링 될 것으로 예상하지만, 테스트 코드에서는 [주문 확인] 버튼 클릭 후 테스트를 종료하기 때문)
+	// case 1 과 case 2 는 같은 기능을 하는 코드이기 때문에 사용자가 편한 방식으로 사용하면 됨. (wait + get = find)
+
+	// case 1
+	/*
+	await waitFor(() => {
+		screen.getByRole('spinbutton', { name: 'America' });
+	});
+*/
+	await screen.findByRole('spinbutton', { name: 'America' });
 });

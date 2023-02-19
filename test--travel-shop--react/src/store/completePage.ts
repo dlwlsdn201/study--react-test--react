@@ -12,7 +12,7 @@ interface INTERFACE_COMPLETE_PAGE {
 // [완료 페이지] 에서 관리되는 state
 const completePageStore = create<INTERFACE_COMPLETE_PAGE>((set) => ({
 	error: false,
-	loading: false,
+	loading: true,
 	orderHistory: [],
 	changeError: (nextState) => set(() => ({ error: nextState })),
 	changeLoading: (nextState) => set(() => ({ loading: nextState })),
